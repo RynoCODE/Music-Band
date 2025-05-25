@@ -22,7 +22,15 @@ export default function Home() {
                 setIsPlaying(true);
               }
             }}>
-            <img src={album.cover} alt={album.name} className="w-24 h-24 rounded-lg mb-2" />
+            <img 
+              src={album.cover} 
+              alt={album.name} 
+              className="w-24 h-24 rounded-lg mb-2 object-cover" 
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://placehold.co/60x60/333/FFF?text=Album";
+              }}
+            />
             <div className="font-semibold text-center">{album.name}</div>
             <div className="text-sm text-neutral-400">{album.artist}</div>
           </div>

@@ -10,7 +10,15 @@ export default function SongCard({ song, playlist }) {
       setCurrentSong(song);
       setIsPlaying(true);
     }}>
-      <img src={song.albumArt} alt="Album" className="w-12 h-12 rounded-lg mr-4" />
+      <img 
+        src={song.albumArt} 
+        alt="Album" 
+        className="w-12 h-12 rounded-lg mr-4 object-cover" 
+        onError={(e) => {
+          e.target.onerror = null;
+          e.target.src = "https://placehold.co/60x60/333/FFF?text=Album";
+        }}
+      />
       <div className="flex-1">
         <div className="font-semibold">{song.title}</div>
         <div className="text-sm text-neutral-400">{song.artist}</div>

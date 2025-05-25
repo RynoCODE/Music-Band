@@ -13,24 +13,38 @@ export default function PlaylistView() {
     setPlaylists([...playlists, { name: newName, songs: [] }]);
     setNewName('');
   };
-  
-  const playPlaylist = (pl) => {
+    const playPlaylist = (pl) => {
     if (pl.songs.length === 0) return;
     
-    const fullSongs = pl.songs.map(song => 
-      typeof song === 'number' ? songs.find(s => s.id === song) : song
-    ).filter(Boolean);
+    const fullSongs = pl.songs.map(song => {
+      if (typeof song === 'number') {
+        return songs.find(s => s.id === song);
+      } else if (typeof song === 'object' && song !== null) {
+        // If it's already an object but missing album art, find the full song object
+        if (!song.albumArt && song.id) {
+          return songs.find(s => s.id === song.id) || song;
+        }
+        return song;
+      }
+      return null;
+    }).filter(Boolean);
+    
     setPlaylist(fullSongs);
     if (fullSongs.length > 0) {
       setCurrentSong(fullSongs[0]);
       setIsPlaying(true);
     }
   };
-
   // Add current song to selected playlist
   const addCurrentToPlaylist = (song) => {
+    // Make sure we're adding the full song object
+    const songToAdd = typeof song === 'number' ? 
+      songs.find(s => s.id === song) : song;
+      
+    if (!songToAdd) return;
+    
     setPlaylists(playlists.map((pl, i) =>
-      i === selected ? { ...pl, songs: [...pl.songs, song] } : pl
+      i === selected ? { ...pl, songs: [...pl.songs, songToAdd] } : pl
     ));
   };
 
@@ -57,10 +71,15 @@ export default function PlaylistView() {
       </div>
       <div>
         <h3 className="font-bold mb-2">Songs in Playlist</h3>
-        {playlists[selected] && playlists[selected].songs.length === 0 && <div className="text-neutral-400">No songs in this playlist.</div>}
-        {playlists[selected] && playlists[selected].songs.map(song => (
-          <SongCard key={song.id + Math.random()} song={song} playlist={playlists[selected].songs} />
-        ))}
+      {playlists[selected] && playlists[selected].songs.length === 0 && <div className="text-neutral-400">No songs in this playlist.</div>}
+        {playlists[selected] && playlists[selected].songs.map(song => {
+          // Make sure we have the full song object with all properties
+          const fullSong = typeof song === 'number' ? 
+            songs.find(s => s.id === song) : song;
+          return fullSong ? 
+            <SongCard key={fullSong.id + Math.random()} song={fullSong} playlist={playlists[selected].songs} /> : 
+            null;
+        })}
       </div>
     </div>
   );
